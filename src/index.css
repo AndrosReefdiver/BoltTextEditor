@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Consolate Elf';
+  src: url('/fonts/ConsolateElf-X33XP.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Consulate';
+  src: url('/fonts/ConsulateConsulateRegular-p7eZd.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Free Monospaced';
+  src: url('/fonts/FreeMonospaced-7ZXP.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Free Monospaced Bold';
+  src: url('/fonts/FreeMonospacedBold-9mOy.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Izayoi Monospaced';
+  src: url('/fonts/IzayoiMonospaced-nwoY.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Bold';
+  src: url('/fonts/JetbrainsMonoBold-51Xez.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Medium';
+  src: url('/fonts/JetbrainsMonoMedium-nRvBM.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Old Computer Manual';
+  src: url('/fonts/OldComputerManualMonospaced-KmlZ.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'ProFont';
+  src: url('/fonts/Profontwindows-axBMx.ttf') format('truetype');
+}
