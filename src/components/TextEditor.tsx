@@ -35,13 +35,19 @@ import FilenameDialog from './FilenameDialog';
 import SyntaxEditor, { SyntaxEditorRef } from './SyntaxEditor';
 import { loadDictionary, convertCase, type CaseStyle } from '../utils/caseConverter';
 
-export default function TextEditor() {
-  const [content, setContent] = useState('');
+interface TextEditorProps {
+  initialText?: string;
+  noFileMode?: boolean;
+  onSave?: (content: string) => void;
+}
+
+export default function TextEditor({ initialText = '', noFileMode = false, onSave }: TextEditorProps) {
+  const [content, setContent] = useState(initialText);
   const [searchTerm, setSearchTerm] = useState('');
   const [replaceTerm, setReplaceTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [history, setHistory] = useState<string[]>(['']);
+  const [history, setHistory] = useState<string[]>([initialText]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [columnMode, setColumnMode] = useState(false);
   const [savedCursorPos, setSavedCursorPos] = useState({ line: 0, col: 0 });
@@ -351,8 +357,9 @@ export default function TextEditor() {
   };
 
   const createNewFile = () => {
-    setContent('');
-    setHistory(['']);
+    const newContent = noFileMode ? initialText : '';
+    setContent(newContent);
+    setHistory([newContent]);
     setHistoryIndex(0);
     setCurrentFilename('');
     setIsDirty(false);
@@ -412,6 +419,15 @@ export default function TextEditor() {
   };
 
   const handleSave = () => {
+    if (noFileMode) {
+      if (onSave) {
+        onSave(content);
+        setIsDirty(false);
+      }
+      setShowFileMenu(false);
+      return;
+    }
+
     if (!currentFilename) {
       setFilenameDialogMode('save');
       setShowFilenameDialog(true);
@@ -459,7 +475,7 @@ export default function TextEditor() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'o') {
+        if (e.key === 'o' && !noFileMode) {
           e.preventDefault();
           handleOpenFile();
         } else if (e.key === 's') {
@@ -471,7 +487,7 @@ export default function TextEditor() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [content, currentFilename]);
+  }, [content, currentFilename, noFileMode]);
 
   const buttonClass = `p-2 rounded transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-slate-100'}`;
   const menuClass = `absolute top-full left-0 mt-1 rounded shadow-lg z-10 ${darkMode ? 'bg-gray-700 border border-gray-600' : 'bg-white border border-slate-200'}`;
@@ -514,13 +530,15 @@ export default function TextEditor() {
                   <FileText size={16} />
                   New
                 </button>
-                <button
-                  onClick={handleOpenFile}
-                  className={menuItemClass}
-                >
-                  <FolderOpen size={16} />
-                  Open
-                </button>
+                {!noFileMode && (
+                  <button
+                    onClick={handleOpenFile}
+                    className={menuItemClass}
+                  >
+                    <FolderOpen size={16} />
+                    Open
+                  </button>
+                )}
                 <button
                   onClick={handleSave}
                   className={menuItemClass}
@@ -528,13 +546,15 @@ export default function TextEditor() {
                   <Save size={16} />
                   Save
                 </button>
-                <button
-                  onClick={handleSaveAs}
-                  className={menuItemClass}
-                >
-                  <Download size={16} />
-                  Save As
-                </button>
+                {!noFileMode && (
+                  <button
+                    onClick={handleSaveAs}
+                    className={menuItemClass}
+                  >
+                    <Download size={16} />
+                    Save As
+                  </button>
+                )}
               </div>
             )}
           </div>
