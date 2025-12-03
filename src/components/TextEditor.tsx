@@ -111,6 +111,14 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
   }, []);
 
   useEffect(() => {
+    setDarkMode(initialDarkMode);
+  }, [initialDarkMode]);
+
+  useEffect(() => {
+    setColorize(initialColorize);
+  }, [initialColorize]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (fileMenuRef.current && !fileMenuRef.current.contains(event.target as Node)) {
         setShowFileMenu(false);
