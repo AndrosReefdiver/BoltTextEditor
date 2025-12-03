@@ -9,6 +9,7 @@ interface SyntaxEditorProps {
   lineHeight?: number;
   darkMode?: boolean;
   colorize?: boolean;
+  lineNumbers?: boolean;
   fontFamily?: string;
   fontSize?: number;
   fontWeight?: string;
@@ -20,8 +21,9 @@ export interface SyntaxEditorRef {
 }
 
 const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
-  ({ content, onContentChange, onKeyDown, onSelect, lineHeight = 1.5, darkMode = false, colorize = true, fontFamily, fontSize, fontWeight, fontStyle }, ref) => {
+  ({ content, onContentChange, onKeyDown, onSelect, lineHeight = 1.5, darkMode = false, colorize = true, lineNumbers = false, fontFamily, fontSize, fontWeight, fontStyle }, ref) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const lineNumbersRef = useRef<HTMLDivElement>(null);
 
     useImperativeHandle(ref, () => ({
       textarea: textareaRef.current,
@@ -62,6 +64,9 @@ const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
       highlightRef.current.scrollTop = textareaRef.current.scrollTop;
       highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
     }
+    if (textareaRef.current && lineNumbersRef.current) {
+      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
   };
 
   const renderHighlightedContent = () => {
@@ -76,14 +81,81 @@ const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
     ));
   };
 
+  const lineCount = content.split('\n').length;
+  const lineNumbersContent = Array.from({ length: lineCount }, (_, i) => i + 1).join('\n');
+
   return (
-    <div className="relative w-full h-full">
-      {colorize && (
+    <div className="relative w-full h-full flex">
+      {lineNumbers && (
         <div
-          ref={highlightRef}
-          className="absolute inset-0 p-4 overflow-auto pointer-events-none whitespace-pre-wrap break-words"
+          ref={lineNumbersRef}
+          className="overflow-hidden select-none pointer-events-none"
           style={{
-            color: 'transparent',
+            width: '3.5rem',
+            paddingTop: '1rem',
+            paddingBottom: '1rem',
+            paddingRight: '0.5rem',
+            textAlign: 'right',
+            lineHeight,
+            fontFamily,
+            fontSize,
+            fontWeight,
+            fontStyle,
+            color: darkMode ? '#6b7280' : '#9ca3af',
+            backgroundColor: darkMode ? '#1f2937' : '#f9fafb',
+            borderRight: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
+          }}
+        >
+          <div className="whitespace-pre">
+            {lineNumbersContent}
+          </div>
+        </div>
+      )}
+      <div className="relative flex-1">
+        {colorize && (
+          <div
+            ref={highlightRef}
+            className="absolute inset-0 p-4 overflow-auto pointer-events-none whitespace-pre-wrap break-words"
+            style={{
+              color: 'transparent',
+              lineHeight,
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
+              fontFamily,
+              fontSize,
+              fontWeight,
+              fontStyle,
+            }}
+          >
+            {renderHighlightedContent()}
+          </div>
+        )}
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => onContentChange(e.target.value)}
+          onKeyDown={onKeyDown}
+          onScroll={syncScroll}
+          onDoubleClick={handleDoubleClick}
+          onSelect={(e) => {
+            const target = e.target as HTMLTextAreaElement;
+            console.log('RAW selectionStart:', target.selectionStart, 'selectionEnd:', target.selectionEnd);
+            console.log('RAW selected text:', JSON.stringify(target.value.substring(target.selectionStart, target.selectionEnd)));
+            console.log('target.value length:', target.value.length, 'content prop length:', content.length);
+            console.log('Are they equal?', target.value === content);
+            onSelect?.(target.selectionStart, target.selectionEnd);
+          }}
+          onMouseUp={(e) => {
+            const target = e.target as HTMLTextAreaElement;
+            onSelect?.(target.selectionStart, target.selectionEnd);
+          }}
+          onKeyUp={(e) => {
+            const target = e.target as HTMLTextAreaElement;
+            onSelect?.(target.selectionStart, target.selectionEnd);
+          }}
+          className={`absolute inset-0 w-full h-full p-4 resize-none focus:outline-none bg-transparent ${darkMode ? 'caret-white' : 'caret-black'}`}
+          style={{
+            color: colorize ? 'transparent' : (darkMode ? '#e5e7eb' : '#1f2937'),
             lineHeight,
             wordBreak: 'break-word',
             overflowWrap: 'break-word',
@@ -92,47 +164,10 @@ const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
             fontWeight,
             fontStyle,
           }}
-        >
-          {renderHighlightedContent()}
-        </div>
-      )}
-      <textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => onContentChange(e.target.value)}
-        onKeyDown={onKeyDown}
-        onScroll={syncScroll}
-        onDoubleClick={handleDoubleClick}
-        onSelect={(e) => {
-          const target = e.target as HTMLTextAreaElement;
-          console.log('RAW selectionStart:', target.selectionStart, 'selectionEnd:', target.selectionEnd);
-          console.log('RAW selected text:', JSON.stringify(target.value.substring(target.selectionStart, target.selectionEnd)));
-          console.log('target.value length:', target.value.length, 'content prop length:', content.length);
-          console.log('Are they equal?', target.value === content);
-          onSelect?.(target.selectionStart, target.selectionEnd);
-        }}
-        onMouseUp={(e) => {
-          const target = e.target as HTMLTextAreaElement;
-          onSelect?.(target.selectionStart, target.selectionEnd);
-        }}
-        onKeyUp={(e) => {
-          const target = e.target as HTMLTextAreaElement;
-          onSelect?.(target.selectionStart, target.selectionEnd);
-        }}
-        className={`absolute inset-0 w-full h-full p-4 resize-none focus:outline-none bg-transparent ${darkMode ? 'caret-white' : 'caret-black'}`}
-        style={{
-          color: colorize ? 'transparent' : (darkMode ? '#e5e7eb' : '#1f2937'),
-          lineHeight,
-          wordBreak: 'break-word',
-          overflowWrap: 'break-word',
-          fontFamily,
-          fontSize,
-          fontWeight,
-          fontStyle,
-        }}
-        placeholder="Start typing..."
-        spellCheck={false}
-      />
+          placeholder="Start typing..."
+          spellCheck={false}
+        />
+      </div>
     </div>
   );
 });

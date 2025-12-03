@@ -41,9 +41,10 @@ interface TextEditorProps {
   onSave?: (content: string) => void;
   darkMode?: boolean;
   colorize?: boolean;
+  lineNumbers?: boolean;
 }
 
-export default function TextEditor({ initialText = '', noFileMode = false, onSave, darkMode: initialDarkMode = true, colorize: initialColorize = true }: TextEditorProps) {
+export default function TextEditor({ initialText = '', noFileMode = false, onSave, darkMode: initialDarkMode = true, colorize: initialColorize = true, lineNumbers: initialLineNumbers = false }: TextEditorProps) {
   const [content, setContent] = useState(initialText);
   const [searchTerm, setSearchTerm] = useState('');
   const [replaceTerm, setReplaceTerm] = useState('');
@@ -65,6 +66,7 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
   const [showLineHeightMenu, setShowLineHeightMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(initialDarkMode);
   const [colorize, setColorize] = useState(initialColorize);
+  const [lineNumbers, setLineNumbers] = useState(initialLineNumbers);
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
@@ -117,6 +119,10 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
   useEffect(() => {
     setColorize(initialColorize);
   }, [initialColorize]);
+
+  useEffect(() => {
+    setLineNumbers(initialLineNumbers);
+  }, [initialLineNumbers]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1000,6 +1006,7 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
             lineHeight={lineHeight}
             darkMode={darkMode}
             colorize={colorize}
+            lineNumbers={lineNumbers}
             fontFamily={fontFamily}
             fontSize={fontSize}
             fontWeight={isBold ? 'bold' : 'normal'}

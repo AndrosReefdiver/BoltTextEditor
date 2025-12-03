@@ -8,6 +8,7 @@ function App() {
   const [savedText, setSavedText] = useState('');
   const [darkMode, setDarkMode] = useState(true);
   const [colorize, setColorize] = useState(true);
+  const [lineNumbers, setLineNumbers] = useState(false);
 
   const sampleInternalText = `Welcome to Internal Document Mode!
 
@@ -81,6 +82,15 @@ Try it out! Make some changes and click Save.`;
                 />
                 <span className="text-sm font-medium">Colorize</span>
               </label>
+              <label className="flex items-center gap-2 cursor-pointer hover:bg-slate-700 px-3 py-1 rounded transition-colors">
+                <input
+                  type="checkbox"
+                  checked={lineNumbers}
+                  onChange={(e) => setLineNumbers(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <span className="text-sm font-medium">Line Numbers</span>
+              </label>
             </div>
           </div>
         </div>
@@ -92,6 +102,7 @@ Try it out! Make some changes and click Save.`;
             key="file-mode"
             darkMode={darkMode}
             colorize={colorize}
+            lineNumbers={lineNumbers}
           />
         ) : (
           <TextEditor
@@ -101,6 +112,7 @@ Try it out! Make some changes and click Save.`;
             onSave={handleInternalSave}
             darkMode={darkMode}
             colorize={colorize}
+            lineNumbers={lineNumbers}
           />
         )}
       </div>
