@@ -302,11 +302,27 @@ export default function TextEditor() {
 
   const handleChangeCase = async (caseStyle: CaseStyle) => {
     if (!searchTerm || !dictionary) return;
+    const textarea = syntaxEditorRef.current?.textarea;
     const selected = getSelectedText();
     if (selected === searchTerm) {
       const converted = await convertCase(selected, caseStyle, dictionary);
-      replaceSelection(converted);
-      handleFindNext();
+      const { start, end } = getSelection();
+      const currentValue = textarea?.value ?? content;
+      const savedScrollTop = textarea?.scrollTop ?? 0;
+      const newContent = currentValue.substring(0, start) + converted + currentValue.substring(end);
+      const searchStart = start + converted.length;
+      const nextIndex = newContent.indexOf(searchTerm, searchStart);
+      if (nextIndex !== -1) {
+        pendingSelectionRef.current = { start: nextIndex, end: nextIndex + searchTerm.length, scrollTop: savedScrollTop };
+      } else {
+        const firstIndex = newContent.indexOf(searchTerm);
+        if (firstIndex !== -1) {
+          pendingSelectionRef.current = { start: firstIndex, end: firstIndex + searchTerm.length, scrollTop: savedScrollTop };
+        } else {
+          pendingSelectionRef.current = { start: start + converted.length, end: start + converted.length, scrollTop: savedScrollTop };
+        }
+      }
+      handleContentChange(newContent);
     } else {
       handleFind();
     }
