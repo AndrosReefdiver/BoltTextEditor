@@ -241,7 +241,9 @@ export default function TextEditor() {
 
   const handleFind = () => {
     if (!searchTerm) return;
-    const index = content.indexOf(searchTerm);
+    const textarea = syntaxEditorRef.current?.textarea;
+    const searchIn = textarea?.value ?? content;
+    const index = searchIn.indexOf(searchTerm);
     if (index !== -1) {
       setSelection(index, index + searchTerm.length);
     }
@@ -249,12 +251,14 @@ export default function TextEditor() {
 
   const handleFindNext = () => {
     if (!searchTerm) return;
+    const textarea = syntaxEditorRef.current?.textarea;
+    const searchIn = textarea?.value ?? content;
     const { end } = getSelection();
-    const index = content.indexOf(searchTerm, end);
+    const index = searchIn.indexOf(searchTerm, end);
     if (index !== -1) {
       setSelection(index, index + searchTerm.length);
     } else {
-      const firstIndex = content.indexOf(searchTerm);
+      const firstIndex = searchIn.indexOf(searchTerm);
       if (firstIndex !== -1) {
         setSelection(firstIndex, firstIndex + searchTerm.length);
       }
@@ -263,12 +267,14 @@ export default function TextEditor() {
 
   const handleFindPrevious = () => {
     if (!searchTerm) return;
+    const textarea = syntaxEditorRef.current?.textarea;
+    const searchIn = textarea?.value ?? content;
     const { start } = getSelection();
-    const index = content.lastIndexOf(searchTerm, start - 1);
+    const index = searchIn.lastIndexOf(searchTerm, start - 1);
     if (index !== -1) {
       setSelection(index, index + searchTerm.length);
     } else {
-      const lastIndex = content.lastIndexOf(searchTerm);
+      const lastIndex = searchIn.lastIndexOf(searchTerm);
       if (lastIndex !== -1) {
         setSelection(lastIndex, lastIndex + searchTerm.length);
       }
@@ -288,7 +294,9 @@ export default function TextEditor() {
 
   const handleReplaceAll = () => {
     if (!searchTerm) return;
-    const newContent = content.split(searchTerm).join(replaceTerm);
+    const textarea = syntaxEditorRef.current?.textarea;
+    const currentValue = textarea?.value ?? content;
+    const newContent = currentValue.split(searchTerm).join(replaceTerm);
     handleContentChange(newContent);
   };
 
