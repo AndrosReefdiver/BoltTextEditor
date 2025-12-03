@@ -253,8 +253,8 @@ export default function TextEditor() {
     if (!searchTerm) return;
     const textarea = syntaxEditorRef.current?.textarea;
     const searchIn = textarea?.value ?? content;
-    const { end } = getSelection();
-    const index = searchIn.indexOf(searchTerm, end);
+    const currentEnd = textarea?.selectionEnd ?? getSelection().end;
+    const index = searchIn.indexOf(searchTerm, currentEnd);
     if (index !== -1) {
       setSelection(index, index + searchTerm.length);
     } else {
@@ -269,8 +269,8 @@ export default function TextEditor() {
     if (!searchTerm) return;
     const textarea = syntaxEditorRef.current?.textarea;
     const searchIn = textarea?.value ?? content;
-    const { start } = getSelection();
-    const index = searchIn.lastIndexOf(searchTerm, start - 1);
+    const currentStart = textarea?.selectionStart ?? getSelection().start;
+    const index = searchIn.lastIndexOf(searchTerm, currentStart - 1);
     if (index !== -1) {
       setSelection(index, index + searchTerm.length);
     } else {
