@@ -8,6 +8,7 @@ interface SyntaxEditorProps {
   onSelect?: (start: number, end: number) => void;
   lineHeight?: number;
   darkMode?: boolean;
+  colorize?: boolean;
   fontFamily?: string;
   fontSize?: number;
   fontWeight?: string;
@@ -19,7 +20,7 @@ export interface SyntaxEditorRef {
 }
 
 const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
-  ({ content, onContentChange, onKeyDown, onSelect, lineHeight = 1.5, darkMode = false, fontFamily, fontSize, fontWeight, fontStyle }, ref) => {
+  ({ content, onContentChange, onKeyDown, onSelect, lineHeight = 1.5, darkMode = false, colorize = true, fontFamily, fontSize, fontWeight, fontStyle }, ref) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useImperativeHandle(ref, () => ({
@@ -77,22 +78,24 @@ const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
 
   return (
     <div className="relative w-full h-full">
-      <div
-        ref={highlightRef}
-        className="absolute inset-0 p-4 overflow-auto pointer-events-none whitespace-pre-wrap break-words"
-        style={{
-          color: 'transparent',
-          lineHeight,
-          wordBreak: 'break-word',
-          overflowWrap: 'break-word',
-          fontFamily,
-          fontSize,
-          fontWeight,
-          fontStyle,
-        }}
-      >
-        {renderHighlightedContent()}
-      </div>
+      {colorize && (
+        <div
+          ref={highlightRef}
+          className="absolute inset-0 p-4 overflow-auto pointer-events-none whitespace-pre-wrap break-words"
+          style={{
+            color: 'transparent',
+            lineHeight,
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            fontFamily,
+            fontSize,
+            fontWeight,
+            fontStyle,
+          }}
+        >
+          {renderHighlightedContent()}
+        </div>
+      )}
       <textarea
         ref={textareaRef}
         value={content}
@@ -118,7 +121,7 @@ const SyntaxEditor = forwardRef<SyntaxEditorRef, SyntaxEditorProps>(
         }}
         className={`absolute inset-0 w-full h-full p-4 resize-none focus:outline-none bg-transparent ${darkMode ? 'caret-white' : 'caret-black'}`}
         style={{
-          color: 'transparent',
+          color: colorize ? 'transparent' : (darkMode ? '#e5e7eb' : '#1f2937'),
           lineHeight,
           wordBreak: 'break-word',
           overflowWrap: 'break-word',

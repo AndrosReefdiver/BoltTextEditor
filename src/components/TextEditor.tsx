@@ -39,9 +39,11 @@ interface TextEditorProps {
   initialText?: string;
   noFileMode?: boolean;
   onSave?: (content: string) => void;
+  darkMode?: boolean;
+  colorize?: boolean;
 }
 
-export default function TextEditor({ initialText = '', noFileMode = false, onSave }: TextEditorProps) {
+export default function TextEditor({ initialText = '', noFileMode = false, onSave, darkMode: initialDarkMode = true, colorize: initialColorize = true }: TextEditorProps) {
   const [content, setContent] = useState(initialText);
   const [searchTerm, setSearchTerm] = useState('');
   const [replaceTerm, setReplaceTerm] = useState('');
@@ -61,7 +63,8 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
   const [isItalic, setIsItalic] = useState(false);
   const [lineHeight, setLineHeight] = useState(1.5);
   const [showLineHeightMenu, setShowLineHeightMenu] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(initialDarkMode);
+  const [colorize, setColorize] = useState(initialColorize);
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
@@ -988,6 +991,7 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
             }}
             lineHeight={lineHeight}
             darkMode={darkMode}
+            colorize={colorize}
             fontFamily={fontFamily}
             fontSize={fontSize}
             fontWeight={isBold ? 'bold' : 'normal'}

@@ -6,6 +6,8 @@ function App() {
   const [mode, setMode] = useState<'file' | 'internal'>('file');
   const [showSavePopup, setShowSavePopup] = useState(false);
   const [savedText, setSavedText] = useState('');
+  const [darkMode, setDarkMode] = useState(true);
+  const [colorize, setColorize] = useState(true);
 
   const sampleInternalText = `Welcome to Internal Document Mode!
 
@@ -34,42 +36,71 @@ Try it out! Make some changes and click Save.`;
       <header className="bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-lg">
         <div className="px-6 py-4">
           <h1 className="text-2xl font-bold mb-3">Text Editor Demo</h1>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setMode('file')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                mode === 'file'
-                  ? 'bg-white text-slate-900 shadow-md'
-                  : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
-              }`}
-            >
-              <FileText size={18} />
-              Test with file support
-            </button>
-            <button
-              onClick={() => setMode('internal')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                mode === 'internal'
-                  ? 'bg-white text-slate-900 shadow-md'
-                  : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
-              }`}
-            >
-              <Database size={18} />
-              Test with internal document
-            </button>
+          <div className="flex gap-4 items-start">
+            <div className="flex gap-3">
+              <button
+                onClick={() => setMode('file')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  mode === 'file'
+                    ? 'bg-white text-slate-900 shadow-md'
+                    : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                }`}
+              >
+                <FileText size={18} />
+                Test with file support
+              </button>
+              <button
+                onClick={() => setMode('internal')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  mode === 'internal'
+                    ? 'bg-white text-slate-900 shadow-md'
+                    : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                }`}
+              >
+                <Database size={18} />
+                Test with internal document
+              </button>
+            </div>
+            <div className="h-10 w-px bg-slate-600"></div>
+            <div className="flex gap-4 py-2">
+              <label className="flex items-center gap-2 cursor-pointer hover:bg-slate-700 px-3 py-1 rounded transition-colors">
+                <input
+                  type="checkbox"
+                  checked={darkMode}
+                  onChange={(e) => setDarkMode(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <span className="text-sm font-medium">Dark Mode</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer hover:bg-slate-700 px-3 py-1 rounded transition-colors">
+                <input
+                  type="checkbox"
+                  checked={colorize}
+                  onChange={(e) => setColorize(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <span className="text-sm font-medium">Colorize</span>
+              </label>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="flex-1 overflow-hidden">
         {mode === 'file' ? (
-          <TextEditor key="file-mode" />
+          <TextEditor
+            key="file-mode"
+            darkMode={darkMode}
+            colorize={colorize}
+          />
         ) : (
           <TextEditor
             key="internal-mode"
             initialText={sampleInternalText}
             noFileMode={true}
             onSave={handleInternalSave}
+            darkMode={darkMode}
+            colorize={colorize}
           />
         )}
       </div>
