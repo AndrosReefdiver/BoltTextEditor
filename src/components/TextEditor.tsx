@@ -304,11 +304,12 @@ export default function TextEditor() {
     if (!searchTerm || !dictionary) return;
     const textarea = syntaxEditorRef.current?.textarea;
     const selected = getSelectedText();
+    const { start, end } = getSelection();
+    const currentValue = textarea?.value ?? content;
+    const savedScrollTop = textarea?.scrollTop ?? 0;
+
     if (selected === searchTerm) {
       const converted = await convertCase(selected, caseStyle, dictionary);
-      const { start, end } = getSelection();
-      const currentValue = textarea?.value ?? content;
-      const savedScrollTop = textarea?.scrollTop ?? 0;
       const newContent = currentValue.substring(0, start) + converted + currentValue.substring(end);
       const searchStart = start + converted.length;
       const nextIndex = newContent.indexOf(searchTerm, searchStart);
