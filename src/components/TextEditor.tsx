@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import ColumnEditor, { ColumnEditorRef } from './ColumnEditor';
 import SearchDialog from './SearchDialog';
+import ConfirmDialog from './ConfirmDialog';
 import SyntaxEditor, { SyntaxEditorRef } from './SyntaxEditor';
 import { loadDictionary, convertCase, type CaseStyle } from '../utils/caseConverter';
 
@@ -38,6 +39,7 @@ export default function TextEditor() {
   const [searchTerm, setSearchTerm] = useState('');
   const [replaceTerm, setReplaceTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [history, setHistory] = useState<string[]>(['']);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [columnMode, setColumnMode] = useState(false);
@@ -339,17 +341,33 @@ export default function TextEditor() {
 
   const handleNew = () => {
     if (isDirty) {
-      const shouldSave = window.confirm('You have unsaved changes. Do you want to save before creating a new file?');
-      if (shouldSave) {
-        handleSave();
-      }
+      setShowConfirmDialog(true);
+    } else {
+      createNewFile();
     }
+  };
+
+  const createNewFile = () => {
     setContent('');
     setHistory(['']);
     setHistoryIndex(0);
     setCurrentFilename('');
     setIsDirty(false);
     setShowFileMenu(false);
+    setShowConfirmDialog(false);
+  };
+
+  const handleConfirmSave = () => {
+    handleSave();
+    createNewFile();
+  };
+
+  const handleConfirmDontSave = () => {
+    createNewFile();
+  };
+
+  const handleConfirmCancel = () => {
+    setShowConfirmDialog(false);
   };
 
   const handleOpenFile = () => {
@@ -878,6 +896,15 @@ export default function TextEditor() {
           onReplace={handleReplace}
           onReplaceAll={handleReplaceAll}
           onChangeCase={handleChangeCase}
+        />
+
+        <ConfirmDialog
+          isOpen={showConfirmDialog}
+          title="Unsaved Changes"
+          message="You have unsaved changes. Would you like to save them before creating a new file?"
+          onSave={handleConfirmSave}
+          onDontSave={handleConfirmDontSave}
+          onCancel={handleConfirmCancel}
         />
       </div>
 
