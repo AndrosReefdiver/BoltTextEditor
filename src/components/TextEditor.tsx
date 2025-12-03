@@ -31,6 +31,7 @@ import {
 import ColumnEditor, { ColumnEditorRef } from './ColumnEditor';
 import SearchDialog from './SearchDialog';
 import ConfirmDialog from './ConfirmDialog';
+import FilenameDialog from './FilenameDialog';
 import SyntaxEditor, { SyntaxEditorRef } from './SyntaxEditor';
 import { loadDictionary, convertCase, type CaseStyle } from '../utils/caseConverter';
 
@@ -58,6 +59,8 @@ export default function TextEditor() {
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [showFilenameDialog, setShowFilenameDialog] = useState(false);
+  const [filenameDialogMode, setFilenameDialogMode] = useState<'save' | 'saveAs' | 'confirmSave'>('save');
   const [currentSelection, setCurrentSelection] = useState<{ start: number; end: number }>({ start: 0, end: 0 });
   const syntaxEditorRef = useRef<SyntaxEditorRef>(null);
   const columnEditorRef = useRef<ColumnEditorRef>(null);
@@ -359,24 +362,20 @@ export default function TextEditor() {
 
   const handleConfirmSave = () => {
     if (!currentFilename) {
-      const filename = prompt('Enter filename:', 'untitled.txt');
-      if (!filename) {
-        return;
-      }
-      setCurrentFilename(filename);
+      setFilenameDialogMode('confirmSave');
+      setShowFilenameDialog(true);
+    } else {
       const blob = new Blob([content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename;
+      a.download = currentFilename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } else {
-      handleSave();
+      createNewFile();
     }
-    createNewFile();
   };
 
   const handleConfirmDontSave = () => {
@@ -413,12 +412,17 @@ export default function TextEditor() {
   };
 
   const handleSave = () => {
-    const filename = currentFilename || 'untitled.txt';
+    if (!currentFilename) {
+      setFilenameDialogMode('save');
+      setShowFilenameDialog(true);
+      return;
+    }
+
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename;
+    a.download = currentFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -428,9 +432,11 @@ export default function TextEditor() {
   };
 
   const handleSaveAs = () => {
-    const filename = prompt('Enter filename:', currentFilename || 'untitled.txt');
-    if (!filename) return;
+    setFilenameDialogMode('saveAs');
+    setShowFilenameDialog(true);
+  };
 
+  const handleFilenameConfirm = (filename: string) => {
     setCurrentFilename(filename);
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -443,6 +449,11 @@ export default function TextEditor() {
     URL.revokeObjectURL(url);
     setIsDirty(false);
     setShowFileMenu(false);
+    setShowFilenameDialog(false);
+
+    if (filenameDialogMode === 'confirmSave') {
+      createNewFile();
+    }
   };
 
   useEffect(() => {
@@ -922,6 +933,15 @@ export default function TextEditor() {
           onSave={handleConfirmSave}
           onDontSave={handleConfirmDontSave}
           onCancel={handleConfirmCancel}
+        />
+
+        <FilenameDialog
+          isOpen={showFilenameDialog}
+          title={filenameDialogMode === 'saveAs' ? 'Save As' : 'Save File'}
+          defaultFilename={currentFilename || 'untitled.txt'}
+          onConfirm={handleFilenameConfirm}
+          onCancel={() => setShowFilenameDialog(false)}
+          darkMode={darkMode}
         />
       </div>
 
