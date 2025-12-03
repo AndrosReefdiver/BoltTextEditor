@@ -58,7 +58,6 @@ export default function TextEditor() {
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
-  const [fileHandle, setFileHandle] = useState<FileSystemFileHandle | null>(null);
   const [currentSelection, setCurrentSelection] = useState<{ start: number; end: number }>({ start: 0, end: 0 });
   const syntaxEditorRef = useRef<SyntaxEditorRef>(null);
   const columnEditorRef = useRef<ColumnEditorRef>(null);
@@ -353,51 +352,31 @@ export default function TextEditor() {
     setHistory(['']);
     setHistoryIndex(0);
     setCurrentFilename('');
-    setFileHandle(null);
     setIsDirty(false);
     setShowFileMenu(false);
     setShowConfirmDialog(false);
   };
 
-  const handleConfirmSave = async () => {
+  const handleConfirmSave = () => {
     if (!currentFilename) {
-      if ('showSaveFilePicker' in window) {
-        try {
-          const options = {
-            suggestedName: 'untitled.txt',
-            types: [
-              {
-                description: 'Text Files',
-                accept: {
-                  'text/plain': ['.txt'],
-                },
-              },
-            ],
-          };
-          const handle = await (window as any).showSaveFilePicker(options);
-          setFileHandle(handle);
-          setCurrentFilename(handle.name);
-          await saveWithFileSystemAPI(handle);
-          createNewFile();
-        } catch (err) {
-          if ((err as Error).name === 'AbortError') {
-            return;
-          }
-          console.error('Error in save dialog:', err);
-        }
-      } else {
-        const filename = prompt('Enter filename:', 'untitled.txt');
-        if (!filename) {
-          return;
-        }
-        setCurrentFilename(filename);
-        fallbackSave(filename);
-        createNewFile();
+      const filename = prompt('Enter filename:', 'untitled.txt');
+      if (!filename) {
+        return;
       }
+      setCurrentFilename(filename);
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } else {
-      await handleSave();
-      createNewFile();
+      handleSave();
     }
+    createNewFile();
   };
 
   const handleConfirmDontSave = () => {
@@ -408,38 +387,9 @@ export default function TextEditor() {
     setShowConfirmDialog(false);
   };
 
-  const handleOpenFile = async () => {
-    if ('showOpenFilePicker' in window) {
-      try {
-        const [handle] = await (window as any).showOpenFilePicker({
-          types: [
-            {
-              description: 'Text Files',
-              accept: {
-                'text/plain': ['.txt'],
-              },
-            },
-          ],
-          multiple: false,
-        });
-        const file = await handle.getFile();
-        const text = await file.text();
-        setContent(text);
-        setHistory([text]);
-        setHistoryIndex(0);
-        setCurrentFilename(handle.name);
-        setFileHandle(handle);
-        setIsDirty(false);
-        setShowFileMenu(false);
-      } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          console.error('Error opening file:', err);
-        }
-      }
-    } else {
-      fileInputRef.current?.click();
-      setShowFileMenu(false);
-    }
+  const handleOpenFile = () => {
+    fileInputRef.current?.click();
+    setShowFileMenu(false);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -453,7 +403,6 @@ export default function TextEditor() {
       setHistory([text]);
       setHistoryIndex(0);
       setCurrentFilename(file.name);
-      setFileHandle(null);
       setIsDirty(false);
     };
     reader.readAsText(file);
@@ -463,21 +412,8 @@ export default function TextEditor() {
     }
   };
 
-  const saveWithFileSystemAPI = async (handle: FileSystemFileHandle) => {
-    try {
-      const writable = await handle.createWritable();
-      await writable.write(content);
-      await writable.close();
-      setIsDirty(false);
-      setShowFileMenu(false);
-      return true;
-    } catch (err) {
-      console.error('Error saving file:', err);
-      return false;
-    }
-  };
-
-  const fallbackSave = (filename: string) => {
+  const handleSave = () => {
+    const filename = currentFilename || 'untitled.txt';
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -491,44 +427,22 @@ export default function TextEditor() {
     setShowFileMenu(false);
   };
 
-  const handleSave = async () => {
-    if (fileHandle) {
-      await saveWithFileSystemAPI(fileHandle);
-    } else {
-      const filename = currentFilename || 'untitled.txt';
-      fallbackSave(filename);
-    }
-  };
+  const handleSaveAs = () => {
+    const filename = prompt('Enter filename:', currentFilename || 'untitled.txt');
+    if (!filename) return;
 
-  const handleSaveAs = async () => {
-    if ('showSaveFilePicker' in window) {
-      try {
-        const options = {
-          suggestedName: currentFilename || 'untitled.txt',
-          types: [
-            {
-              description: 'Text Files',
-              accept: {
-                'text/plain': ['.txt'],
-              },
-            },
-          ],
-        };
-        const handle = await (window as any).showSaveFilePicker(options);
-        setFileHandle(handle);
-        setCurrentFilename(handle.name);
-        await saveWithFileSystemAPI(handle);
-      } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          console.error('Error in save dialog:', err);
-        }
-      }
-    } else {
-      const filename = prompt('Enter filename:', currentFilename || 'untitled.txt');
-      if (!filename) return;
-      setCurrentFilename(filename);
-      fallbackSave(filename);
-    }
+    setCurrentFilename(filename);
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setIsDirty(false);
+    setShowFileMenu(false);
   };
 
   useEffect(() => {
