@@ -156,6 +156,10 @@ export default function TextEditor() {
   };
 
   const getSelection = () => {
+    const textarea = syntaxEditorRef.current?.textarea;
+    if (textarea) {
+      return { start: textarea.selectionStart, end: textarea.selectionEnd };
+    }
     return currentSelection;
   };
 
