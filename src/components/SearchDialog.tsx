@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Search, ChevronDown, ChevronUp, Replace } from 'lucide-react';
+import { X, Search, ChevronDown, ChevronUp, Replace, CaseSensitive } from 'lucide-react';
+import type { CaseStyle } from '../utils/caseConverter';
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface SearchDialogProps {
   onFindPrevious: () => void;
   onReplace: () => void;
   onReplaceAll: () => void;
+  onChangeCase: (caseStyle: CaseStyle) => void;
 }
 
 export default function SearchDialog({
@@ -25,6 +27,7 @@ export default function SearchDialog({
   onFindPrevious,
   onReplace,
   onReplaceAll,
+  onChangeCase,
 }: SearchDialogProps) {
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
@@ -33,8 +36,26 @@ export default function SearchDialog({
   const [matchWholeWord, setMatchWholeWord] = useState(false);
   const [useRegex, setUseRegex] = useState(false);
   const [extendedSearch, setExtendedSearch] = useState(false);
+  const [selectedCaseOption, setSelectedCaseOption] = useState<CaseStyle | 'none'>('none');
   const dialogRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const caseOptions: Array<{ value: CaseStyle | 'none'; label: string }> = [
+    { value: 'none', label: 'None' },
+    { value: 'UPPERCASE', label: 'UPPER CASE' },
+    { value: 'lowercase', label: 'lower case' },
+    { value: 'Title Case', label: 'Title Case' },
+    { value: 'Sentence case', label: 'Sentence case' },
+    { value: 'camelCase', label: 'camelCase' },
+    { value: 'PascalCase', label: 'PascalCase' },
+    { value: 'snake_case', label: 'snake_case' },
+  ];
+
+  const handleChangeCase = () => {
+    if (selectedCaseOption !== 'none') {
+      onChangeCase(selectedCaseOption);
+    }
+  };
 
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
@@ -173,6 +194,29 @@ export default function SearchDialog({
               title="Replace All"
             >
               All
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <CaseSensitive size={16} className="text-slate-500" />
+            <select
+              value={selectedCaseOption}
+              onChange={(e) => setSelectedCaseOption(e.target.value as CaseStyle | 'none')}
+              className="flex-1 px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+            >
+              {caseOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleChangeCase}
+              disabled={selectedCaseOption === 'none'}
+              className="px-3 py-1.5 hover:bg-slate-100 rounded border border-slate-300 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Change case and find next"
+            >
+              Change
             </button>
           </div>
         </div>

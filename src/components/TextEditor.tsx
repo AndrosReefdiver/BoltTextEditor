@@ -292,6 +292,18 @@ export default function TextEditor() {
     handleContentChange(newContent);
   };
 
+  const handleChangeCase = async (caseStyle: CaseStyle) => {
+    if (!searchTerm || !dictionary) return;
+    const selected = getSelectedText();
+    if (selected === searchTerm) {
+      const converted = await convertCase(selected, caseStyle, dictionary);
+      replaceSelection(converted);
+      handleFindNext();
+    } else {
+      handleFind();
+    }
+  };
+
   const handleSelectAll = () => {
     setSelection(0, content.length);
   };
@@ -836,6 +848,7 @@ export default function TextEditor() {
           onFindPrevious={handleFindPrevious}
           onReplace={handleReplace}
           onReplaceAll={handleReplaceAll}
+          onChangeCase={handleChangeCase}
         />
       </div>
 
