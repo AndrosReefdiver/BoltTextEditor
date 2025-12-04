@@ -25,30 +25,30 @@ export default function UnicodeDialog({ isOpen, onClose, onInsert, darkMode = fa
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2" onClick={onClose}>
       <div
         className={`rounded-lg shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-          <h2 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>Insert Unicode Character</h2>
-          <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className={`px-3 py-2 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+          <h2 className={`text-base font-bold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>Insert Unicode Character</h2>
+          <p className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Click any character to insert it at the cursor position
           </p>
         </div>
 
-        <div className="flex-1 overflow-auto px-6 py-4">
+        <div className="flex-1 overflow-auto px-3 py-2">
           {Object.entries(unicodeCategories).map(([category, chars]) => (
-            <div key={category} className="mb-6">
-              <h3 className={`text-sm font-semibold mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div key={category} className="mb-3">
+              <h3 className={`text-xs font-semibold mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 {category}
               </h3>
-              <div className="grid grid-cols-12 gap-2">
+              <div className="grid grid-cols-12 gap-1">
                 {chars.map((char, idx) => (
                   <button
                     key={`${category}-${idx}`}
                     onClick={() => handleCharClick(char)}
-                    className={`aspect-square flex items-center justify-center text-xl font-mono rounded transition-all ${
+                    className={`aspect-square flex items-center justify-center text-sm font-mono rounded transition-all ${
                       darkMode
                         ? 'bg-gray-700 hover:bg-gray-600 active:bg-gray-500'
                         : 'bg-gray-100 hover:bg-gray-200 active:bg-gray-300'
@@ -63,10 +63,10 @@ export default function UnicodeDialog({ isOpen, onClose, onInsert, darkMode = fa
           ))}
         </div>
 
-        <div className={`px-6 py-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} flex justify-end`}>
+        <div className={`px-3 py-2 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} flex justify-end`}>
           <button
             onClick={onClose}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-2 py-1 rounded-lg font-medium transition-colors ${
               darkMode
                 ? 'bg-gray-700 hover:bg-gray-600 text-gray-100'
                 : 'bg-gray-800 hover:bg-gray-700 text-white'
