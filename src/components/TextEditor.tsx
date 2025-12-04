@@ -27,11 +27,13 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import ColumnEditor, { ColumnEditorRef } from './ColumnEditor';
 import SearchDialog from './SearchDialog';
 import ConfirmDialog from './ConfirmDialog';
 import FilenameDialog from './FilenameDialog';
+import UnicodeDialog from './UnicodeDialog';
 import SyntaxEditor, { SyntaxEditorRef } from './SyntaxEditor';
 import { loadDictionary, convertCase, type CaseStyle } from '../utils/caseConverter';
 
@@ -49,6 +51,7 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
   const [searchTerm, setSearchTerm] = useState('');
   const [replaceTerm, setReplaceTerm] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [showUnicodeDialog, setShowUnicodeDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [history, setHistory] = useState<string[]>([initialText]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -257,6 +260,10 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
 
   const handleDelete = () => {
     replaceSelection('');
+  };
+
+  const handleUnicodeInsert = (char: string) => {
+    replaceSelection(char);
   };
 
   const handleCaseConversion = async (style: CaseStyle) => {
@@ -674,6 +681,14 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
             <Search size={18} />
           </button>
 
+          <button
+            onClick={() => setShowUnicodeDialog(true)}
+            className={buttonClass}
+            title="Insert Unicode Character"
+          >
+            <Sparkles size={18} />
+          </button>
+
           <div className={dividerClass} />
 
           <div className="relative" ref={caseMenuRef}>
@@ -978,6 +993,13 @@ export default function TextEditor({ initialText = '', noFileMode = false, onSav
           defaultFilename={currentFilename || 'untitled.txt'}
           onConfirm={handleFilenameConfirm}
           onCancel={() => setShowFilenameDialog(false)}
+          darkMode={darkMode}
+        />
+
+        <UnicodeDialog
+          isOpen={showUnicodeDialog}
+          onClose={() => setShowUnicodeDialog(false)}
+          onInsert={handleUnicodeInsert}
           darkMode={darkMode}
         />
       </div>
