@@ -48,7 +48,7 @@ export default function UnicodeDialog({ isOpen, onClose, onInsert, darkMode = fa
                   <button
                     key={`${category}-${idx}`}
                     onClick={() => handleCharClick(char)}
-                    className={`w-6 h-6 flex items-center justify-center text-xs font-mono rounded transition-all ${
+                    className={`w-[26px] h-[26px] flex items-center justify-center text-[14.4px] font-mono rounded transition-all ${
                       darkMode
                         ? 'bg-gray-700 hover:bg-gray-600 active:bg-gray-500'
                         : 'bg-gray-100 hover:bg-gray-200 active:bg-gray-300'
