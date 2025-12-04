@@ -35,7 +35,7 @@ export default function UnicodeDialog({ isOpen, onClose, onInsert, darkMode = fa
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2" onClick={onClose}>
       <div
-        className={`rounded-lg shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}
+        className={`rounded-lg shadow-2xl max-w-[44.8rem] w-full max-h-[85vh] flex flex-col ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className={`px-3 py-2 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -51,7 +51,7 @@ export default function UnicodeDialog({ isOpen, onClose, onInsert, darkMode = fa
               <h3 className={`text-xs font-semibold mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 {category}
               </h3>
-              <div className="grid grid-cols-12 gap-1">
+              <div className="grid grid-cols-10 gap-1">
                 {chars.map((char, idx) => (
                   <button
                     key={`${category}-${idx}`}
